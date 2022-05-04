@@ -35,19 +35,19 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
-    const userCollection = client.db("assignment-11").collection("inventory");
+    const bikeCollection = client.db("assignment-11").collection("inventory");
 
     // get users
     app.get("/inventory", async (req, res) => {
       const query = {};
-      const cursor = userCollection.find(query);
+      const cursor = bikeCollection.find(query);
       const users = await cursor.toArray();
       res.send(users);
     });
     app.get("/inventory/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
-      const result = await userCollection.findOne(query);
+      const result = await bikeCollection.findOne(query);
       res.send(result);
     });
     app.put("/inventory/:id", async (req, res) => {
@@ -65,7 +65,7 @@ async function run() {
           quantity: newItem.quantity,
         },
       };
-      const result = await userCollection.updateOne(
+      const result = await bikeCollection.updateOne(
         filter,
         updatedDoc,
         options
@@ -76,25 +76,26 @@ async function run() {
     app.delete("/inventory/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
-      const result = await userCollection.deleteOne(query);
+      const result = await bikeCollection.deleteOne(query);
       res.send(result);
     });
 
-    app.get("/myproducts", async (req, res) => {
+    app.get("/mybikes", async (req, res) => {
       //   const reqEmail = req.decoded.email;
       //   const email = req.query.email;
       //   if (email === reqEmail) {
       const query = { email: email };
-      const cursor = userCollection.find(query);
+      const cursor = bikeCollection.find(query);
       const myItems = await cursor.toArray();
       res.send(myItems);
       //   } else {
       //     res.status(403).send({ message: "Forbidden access" });
       //   }
     });
+
     app.post("/inventory", async (req, res) => {
       const newCar = req.body;
-      const result = await userCollection.insertOne(newCar);
+      const result = await bikeCollection.insertOne(newCar);
       res.send(result);
     });
   } finally {
