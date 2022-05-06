@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-// const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
@@ -10,21 +10,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// function verifyJWT(req, res, next) {
-//     const authHeader = req.headers.authorization;
-//     if (!authHeader) {
-//         return res.status(401).send({ message: 'unauthorized access' });
-//     }
-//     const token = authHeader.split(' ')[1];
-//     jwt.verify(token, process.env.SECRET_ACCESS_TOKEN, (err, decoded) => {
-//         if (err) {
-//             return res.status(403).send({ message: 'Forbidden access' });
-//         }
-//         console.log('decoded', decoded);
-//         req.decoded = decoded;
-//         next();
-//     })
-// }
+function verifyJWT(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send({ message: "unauthorized access" });
+  }
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, process.env.SECRET_ACCESS_TOKEN, (err, decoded) => {
+    if (err) {
+      return res.status(403).send({ message: "Forbidden access" });
+    }
+
+    req.decoded = decoded;
+    next();
+  });
+}
 
 const uri = `mongodb+srv://${process.env.user}:${process.env.password}@cluster0.ubkg8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
@@ -80,17 +80,17 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/mybikes", async (req, res) => {
-      //   const reqEmail = req.decoded.email;
-      //   const email = req.query.email;
-      //   if (email === reqEmail) {
-      const query = { email: email };
-      const cursor = bikeCollection.find(query);
-      const myItems = await cursor.toArray();
-      res.send(myItems);
-      //   } else {
-      //     res.status(403).send({ message: "Forbidden access" });
-      //   }
+    app.get("/mybikes", verifyJWT, async (req, res) => {
+      const reqEmail = req.decoded.email;
+      const email = req.query.email;
+      if (email === reqEmail) {
+        const query = { email: email };
+        const cursor = bikeCollection.find(query);
+        const myItems = await cursor.toArray();
+        res.send(myItems);
+      } else {
+        res.status(403).send({ message: "Forbidden access" });
+      }
     });
 
     app.post("/inventory", async (req, res) => {
