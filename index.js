@@ -98,6 +98,7 @@ async function run() {
       const result = await bikeCollection.insertOne(newCar);
       res.send(result);
     });
+
     app.post("/login", async (req, res) => {
       const user = req.body;
       const accessToken = jwt.sign(user, process.env.SECRET_ACCESS_TOKEN, {
@@ -106,7 +107,6 @@ async function run() {
       res.send({ accessToken });
     });
   } finally {
-    // console.log('gg');
   }
 }
 run().catch(console.dir);
