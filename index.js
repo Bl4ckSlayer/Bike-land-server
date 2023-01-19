@@ -15,7 +15,7 @@ function verifyJWT(req, res, next) {
   if (!authHeader) {
     return res.status(401).send({ message: "unauthorized access" });
   }
-  const token = authHeader.split(" ")[1];
+  const token = authHeader.split[1];
   jwt.verify(token, process.env.SECRET_ACCESS_TOKEN, (err, decoded) => {
     if (err) {
       return res.status(403).send({ message: "Forbidden access" });
@@ -116,5 +116,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log("Listening..");
+  console.log("Listening.. to port 5000");
 });
